@@ -1,65 +1,120 @@
-import Image from "next/image";
+'use client';
+
+import Link from 'next/link';
+import Hero from '@/components/Hero';
+import ProductCard from '@/components/ProductCard';
+import { products } from '@/data/products';
+import { ArrowRight, Star, ShieldCheck, Zap } from 'lucide-react';
+import { Section } from '@/components/layout/Section';
+import { Container } from '@/components/layout/Container';
+import { PageWrapper } from '@/components/layout/PageWrapper';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 
 export default function Home() {
+  const featuredProducts = products.slice(0, 3);
+
+  const features = [
+    {
+      icon: <Zap className="text-orange-600" size={32} />,
+      title: 'Быстрая доставка',
+      desc: 'Доставляем по всей России в кратчайшие сроки.'
+    },
+    {
+      icon: <ShieldCheck className="text-orange-600" size={32} />,
+      title: 'Гарантия качества',
+      desc: 'Только оригинальные бренды и проверенные комплектующие.'
+    },
+    {
+      icon: <Star className="text-orange-600" size={32} />,
+      title: 'Премиум сервис',
+      desc: 'Помогаем с выбором и настройкой вашего первого скейта.'
+    }
+  ];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <PageWrapper pt-0>
+      <Hero />
+      
+      {/* Featured Products */}
+      <Section id="featured">
+        <Container>
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+            <div className="max-w-xl">
+              <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 text-zinc-900 leading-[0.9]">
+                ПОПУЛЯРНЫЕ <br />
+                <span className="text-orange-600">ТОВАРЫ</span>
+              </h2>
+              <p className="text-zinc-500 text-xl font-medium">
+                Наши самые востребованные модели, которые выбирают профессионалы и любители по всему миру.
+              </p>
+            </div>
+            <Link href="/catalog">
+              <Button variant="outline" className="group">
+                СМОТРЕТЬ ВСЕ
+                <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      {/* Features Section */}
+      <Section>
+        <Container>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((feature, idx) => (
+              <Card key={idx} className="flex flex-col items-center border border-orange-600 text-center gap-6" padding="lg">
+                <div className="p-5 bg-orange-50 rounded-3xl text-orange-600">
+                  {feature.icon}
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black mb-3 italic uppercase tracking-tight">{feature.title}</h3>
+                  <p className="text-zinc-500 font-medium leading-relaxed">{feature.desc}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      {/* Newsletter */}
+      <Section>
+        <Container>
+          <div className="bg-zinc-950 rounded-[4rem] p-12 md:p-24 relative overflow-hidden flex flex-col items-center text-center">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-orange-600/20 rounded-full -translate-y-1/2 translate-x-1/2 blur-[120px]" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-600/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-[120px]" />
+            
+            <div className="relative z-10 max-w-3xl">
+              <h2 className="text-5xl md:text-8xl font-black text-white tracking-tighter mb-8 italic leading-none">
+                ПРИСОЕДИНЯЙСЯ <br />
+                <span className="text-orange-600 text-glow">К КОМАНДЕ</span>
+              </h2>
+              <p className="text-zinc-400 text-xl mb-12 max-w-2xl mx-auto font-medium">
+                Подпишись на нашу рассылку и получи скидку 10% на первую покупку, а также доступ к эксклюзивным дропам.
+              </p>
+              
+              <form className="w-full flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
+                <input 
+                  type="email" 
+                  placeholder="Ваш email" 
+                  className="flex-1 bg-zinc-900 border-2 border-zinc-800 focus:border-orange-600 focus:outline-none rounded-full px-8 py-4 text-white font-medium transition-all"
+                  required
+                />
+                <Button type="submit" variant="primary" size="lg">
+                  ПОДПИСАТЬСЯ
+                </Button>
+              </form>
+            </div>
+          </div>
+        </Container>
+      </Section>
+    </PageWrapper>
   );
 }
