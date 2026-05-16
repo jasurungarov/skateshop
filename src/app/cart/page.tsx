@@ -122,10 +122,10 @@ const CartPage = () => {
 
                         <div className="md:col-span-1 flex flex-col items-end w-full">
                           <span className="text-2xl font-black text-zinc-900 italic">
-                            {(item.price * item.quantity).toLocaleString('ru-RU')} ₽
+                            {(item.price * item.quantity).toLocaleString('ru-RU')} СОМ
                           </span>
                           <span className="text-[10px] text-zinc-400 font-black uppercase tracking-tighter italic">
-                            {item.price.toLocaleString('ru-RU')} ₽ / шт.
+                            {item.price.toLocaleString('ru-RU')} СОМ / шт.
                           </span>
                         </div>
 
@@ -147,7 +147,7 @@ const CartPage = () => {
                 <div className="flex flex-col gap-6 mb-12">
                   <div className="flex justify-between items-center text-zinc-400">
                     <span className="text-sm font-bold uppercase tracking-widest italic">ТОВАРЫ ({totalItems})</span>
-                    <span className="font-bold">{totalPrice.toLocaleString('ru-RU')} ₽</span>
+                    <span className="font-bold">{totalPrice.toLocaleString('ru-RU')} СОМ</span>
                   </div>
                   <div className="flex justify-between items-center text-zinc-400">
                     <span className="text-sm font-bold uppercase tracking-widest italic">ДОСТАВКА</span>
@@ -159,7 +159,7 @@ const CartPage = () => {
                 <div className="mb-12">
                   <span className="text-zinc-500 text-xs font-black uppercase tracking-widest mb-2 block italic">К ОПЛАТЕ</span>
                   <span className="text-6xl font-black text-white tracking-tighter italic">
-                    {totalPrice.toLocaleString('ru-RU')} ₽
+                    {totalPrice.toLocaleString('ru-RU')} СОМ
                   </span>
                 </div>
                 
