@@ -105,10 +105,10 @@ const ProductDetailPage = () => {
               
               <div className="flex items-end gap-6 mb-10">
                 <span className="text-5xl font-black text-zinc-900 leading-none">
-                  {product.price.toLocaleString('ru-RU')} ₽
+                  {product.price.toLocaleString('ru-RU')} СОМ
                 </span>
                 <span className="text-zinc-300 text-xl font-medium line-through decoration-orange-600/30">
-                  {(product.price * 1.25).toLocaleString('ru-RU')} ₽
+                  {(product.price * 1.25).toLocaleString('ru-RU')} СОМ
                 </span>
               </div>
 

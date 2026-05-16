@@ -62,7 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             {product.category}
           </span>
           <span className="text-lg font-black text-zinc-900 leading-none">
-            {product.price.toLocaleString('ru-RU')} ₽
+            {product.price.toLocaleString('ru-RU')} СОМ
           </span>
         </div>
         

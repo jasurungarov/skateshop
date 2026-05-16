@@ -18,7 +18,7 @@ export default function Home() {
     {
       icon: <Zap className="text-orange-600" size={32} />,
       title: 'Быстрая доставка',
-      desc: 'Доставляем по всей России в кратчайшие сроки.'
+      desc: 'Доставляем по всей области в кратчайшие сроки.'
     },
     {
       icon: <ShieldCheck className="text-orange-600" size={32} />,
