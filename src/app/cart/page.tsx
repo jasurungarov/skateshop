@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
-import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from 'lucide-react';
+import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, Send, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PageWrapper } from '@/components/layout/PageWrapper';
@@ -13,8 +14,79 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 
 const CartPage = () => {
-  const { cart, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
+  const { cart, removeFromCart, updateQuantity, totalPrice, totalItems, clearCart } = useCart();
+  
+  // Form va yuklanish holatlari
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerAddress, setCustomerAddress] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
+  // Buyurtmani saytdan chiqmasdan yuborish fun hisoblanadi
+  const handleOrderSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName,
+          customerPhone,
+          customerAddress,
+          cartItems: cart,
+          totalPrice
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsSuccess(true);
+        // Agar context'ingizda clearCart() bo'lsa savatchani tozalaymiz
+        if (clearCart) clearCart(); 
+      } else {
+        alert('Что-то пошло не так. Попробуйте еще раз.');
+      }
+    } catch (error) {
+      alert('Ошибка соединения с сервером.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 1. BUYURTMA MUVAFFAQIYATLI BO'LGANDAGI EKRAN
+  if (isSuccess) {
+    return (
+      <PageWrapper>
+        <Section className="min-h-[70vh] flex flex-col items-center justify-center text-center">
+          <Container>
+            <motion.div 
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-32 h-32 bg-emerald-50 text-emerald-500 rounded-[2.5rem] flex items-center justify-center mx-auto mb-12 border border-emerald-100 shadow-sm"
+            >
+              <CheckCircle size={56} />
+            </motion.div>
+            <h2 className="text-4xl md:text-6xl font-black text-zinc-900 tracking-tighter mb-6 uppercase italic">ЗАКАЗ ПРИНЯТ!</h2>
+            <p className="text-zinc-500 mb-12 max-w-md text-base md:text-lg font-medium mx-auto">
+              Спасибо, *{customerName}*! Ваши данные успешно отправлены менеджеру. Мы свяжемся с вами в течение 15 минут для подтверждения доставки.
+            </p>
+            <Link href="/catalog">
+              <Button size="lg" className="gap-3 uppercase italic tracking-widest shadow-xl">
+                ПРОДОЛЖИТЬ ПОКУПКИ
+                <ArrowRight size={20} />
+              </Button>
+            </Link>
+          </Container>
+        </Section>
+      </PageWrapper>
+    );
+  }
+
+  // 2. SAVATCHA BO'SH BO'LGANDAGI EKRAN
   if (cart.length === 0) {
     return (
       <PageWrapper>
@@ -139,42 +211,90 @@ const CartPage = () => {
               </div>
             </div>
 
-            {/* Summary */}
+            {/* Summary & Checkout Form */}
             <div className="xl:col-span-1">
-              <div className="bg-zinc-950 p-10 rounded-[3rem] text-white sticky top-32 shadow-2xl shadow-zinc-950/20 border border-white/5">
-                <h3 className="text-2xl font-black tracking-tighter mb-10 uppercase italic">ИТОГОВАЯ СУММА</h3>
+              <div className="bg-zinc-950 p-8 md:p-10 rounded-[3rem] text-white sticky top-32 shadow-2xl shadow-zinc-950/20 border border-white/5">
+                <h3 className="text-2xl font-black tracking-tighter mb-8 uppercase italic">ОФОРМЛЕНИЕ</h3>
                 
-                <div className="flex flex-col gap-6 mb-12">
-                  <div className="flex justify-between items-center text-zinc-400">
-                    <span className="text-sm font-bold uppercase tracking-widest italic">ТОВАРЫ ({totalItems})</span>
-                    <span className="font-bold">{totalPrice.toLocaleString('ru-RU')} СОМ</span>
+                <form onSubmit={handleOrderSubmit} className="space-y-5 mb-8">
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-zinc-500 mb-2 italic">Ваше Имя</label>
+                    <input 
+                      type="text"
+                      required
+                      disabled={isLoading}
+                      placeholder="Имя"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3.5 text-sm font-medium text-white focus:outline-none focus:border-orange-500 transition-colors placeholder:text-zinc-700 disabled:opacity-50"
+                    />
                   </div>
-                  <div className="flex justify-between items-center text-zinc-400">
-                    <span className="text-sm font-bold uppercase tracking-widest italic">ДОСТАВКА</span>
-                    <span className="text-orange-600 font-black text-xs tracking-widest uppercase italic">FREE EXPRESS</span>
+
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-zinc-500 mb-2 italic">Телефон</label>
+                    <input 
+                      type="tel"
+                      required
+                      disabled={isLoading}
+                      placeholder="+996 (700) 123-456"
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3.5 text-sm font-medium text-white focus:outline-none focus:border-orange-500 transition-colors placeholder:text-zinc-700 disabled:opacity-50"
+                    />
                   </div>
-                  <div className="h-px w-full bg-zinc-800" />
-                </div>
-                
-                <div className="mb-12">
-                  <span className="text-zinc-500 text-xs font-black uppercase tracking-widest mb-2 block italic">К ОПЛАТЕ</span>
-                  <span className="text-6xl font-black text-white tracking-tighter italic">
-                    {totalPrice.toLocaleString('ru-RU')} СОМ
-                  </span>
-                </div>
-                
-                <div className="flex flex-col gap-4">
-                  <Button size="lg" className="w-full gap-3 uppercase italic tracking-widest">
-                      ОФОРМИТЬ ЗАКАЗ
-                      <ArrowRight size={20} />
-                  </Button>
-                  <Link 
-                      href="/catalog" 
-                      className="w-full py-2 text-center text-[10px] font-black text-zinc-500 hover:text-white transition-all uppercase tracking-[0.3em] block italic"
-                  >
-                      ВЕРНУТЬСЯ В МАГАЗИН
-                  </Link>
-                </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-zinc-500 mb-2 italic">Адрес доставки (КР)</label>
+                    <textarea 
+                      rows={2}
+                      required
+                      disabled={isLoading}
+                      placeholder="Город, улица, дом"
+                      value={customerAddress}
+                      onChange={(e) => setCustomerAddress(e.target.value)}
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3.5 text-sm font-medium text-white focus:outline-none focus:border-orange-500 transition-colors resize-none placeholder:text-zinc-700 disabled:opacity-50"
+                    />
+                  </div>
+
+                  <div className="h-px w-full bg-zinc-800 my-6" />
+
+                  {/* Pricing Summary */}
+                  <div className="flex flex-col gap-4 mb-6">
+                    <div className="flex justify-between items-center text-zinc-400">
+                      <span className="text-xs font-bold uppercase tracking-widest italic">ТОВАРЫ ({totalItems})</span>
+                      <span className="font-bold text-sm text-zinc-200">{totalPrice.toLocaleString('ru-RU')} СОМ</span>
+                    </div>
+                    <div className="flex justify-between items-center text-zinc-400">
+                      <span className="text-xs font-bold uppercase tracking-widest italic">ДОСТАВКА</span>
+                      <span className="text-orange-500 font-black text-[10px] tracking-widest uppercase italic">FREE EXPRESS</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-1 block italic">К ОПЛАТЕ</span>
+                    <span className="text-4xl md:text-5xl font-black text-white tracking-tighter italic block mb-6">
+                      {totalPrice.toLocaleString('ru-RU')} СОМ
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-4">
+                    <Button 
+                      type="submit" 
+                      size="lg" 
+                      disabled={isLoading}
+                      className="w-full gap-3 uppercase italic tracking-widest bg-orange-600 hover:bg-orange-700 text-white transition-colors border-none shadow-lg disabled:opacity-50"
+                    >
+                        {isLoading ? 'ОТПРАВКА...' : 'ПОДТВЕРДИТЬ ЗАКАЗ'}
+                        <Send size={18} />
+                    </Button>
+                    <Link 
+                        href="/catalog" 
+                        className="w-full py-2 text-center text-[10px] font-black text-zinc-500 hover:text-white transition-all uppercase tracking-[0.3em] block italic"
+                    >
+                        ВЕРНУТЬСЯ В МАГАЗИН
+                    </Link>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
